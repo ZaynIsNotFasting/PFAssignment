@@ -1,0 +1,73 @@
+
+
+***
+
+### 1. Supermarket Management (Q2)
+
+This program acts like a cash register. The main challenge is keeping track of the store's products and the customer's shopping cart.
+
+* **Logic for Storing Data:** The easiest way to store the inventory is by using **Parallel Arrays**. Imagine four columns in a spreadsheet.
+    * An array for **Product Codes** (e.g., "001", "002", "003")
+    * An array for **Product Names** (e.g., "Milk", "Bread", "Eggs")
+    * An array for **Prices** (e.g., 100.0, 200.0, 300.0)
+    * An array for **Stock Quantity** (e.g., 50, 10, 20)
+
+    The **index** connects them. Index `1` always refers to "Bread", which costs 200.0 and has 10 in stock.
+* **Logic for the Cart:** You create one more parallel array, `cartQuantity`, with all values set to `0`. When a customer buys 3 "Eggs" (which is at index `2`), you just set `cartQuantity[2] = 3`.
+* **Logic for Updating Stock:** When the customer buys 3 "Eggs" (index `2`), you must *also* subtract that from the main stock: `inventoryQuantity[2] = inventoryQuantity[2] - 3`.
+* **Logic for the Bill:** To calculate the total, you loop through your arrays. For each item, you multiply its price by the quantity in the cart: `totalBill += productPrices[i] * cartQuantity[i]`.
+* **Logic for Discount:** After you have the `totalBill`, you ask the user for a promo code. You use a **string comparison** to check if the text they typed exactly matches "Eid2025". If it does, you set the `finalBill = totalBill * 0.75` (which is a 25% discount).
+
+***
+
+### 2. Power Grid Monitor (Q3)
+
+This problem is a puzzle. The goal is to store three "ON/OFF" switches (Power, Overload, Maintenance) in a *single number* instead of three separate variables.
+
+* **Logic (Bitwise):** The key is to use **bits**. A number in the computer is made of 0s and 1s. We assign a meaning to each bit position.
+    * **1s place (Bit 0):** Power Status (1=ON, 0=OFF)
+    * **2s place (Bit 1):** Overload Status (1=ON, 0=OFF)
+    * **4s place (Bit 2):** Maintenance Status (1=ON, 0=OFF)
+* **Example:** If a sector has a status value of **6**, its binary form is `110`.
+    * **1** in the 4s place: Maintenance is **ON**.
+    * **1** in the 2s place: Overload is **ON**.
+    * **0** in the 1s place: Power is **OFF**.
+* **How to Check a Flag (The `&` Operator):** To see if the Overload (value `2`) is ON for a status of `6`, you use the bitwise `&` (AND) operator. `(6 & 2)` asks "Which bits do `110` and `010` have in common?" The answer is `010` (which is 2). Since the result is not zero, the flag is ON.
+* **How to Turn a Flag ON (The `|` Operator):** To turn ON the Power (value `1`) for a status of `6` (`110`), you use the bitwise `|` (OR) operator. `(6 | 1)` combines the bits `110` and `001` to make `111` (which is 7). The new status is 7.
+* **How to Turn a Flag OFF (The `&~` Operators):** To turn OFF the Overload (value `2`) for a status of `7` (`111`), you use the `&` and `~` (NOT) operators. `(7 & ~2)` means "Take `111` AND NOT `010`". This becomes `111 & 101`, which results in `101` (which is 5). The new status is 5.
+
+***
+
+### 3. Stack Implementation (Q4)
+
+This problem asks you to build a "stack of plates" using an array. The rule is you can only add or remove plates from the **top**. This is called **LIFO** (Last-In, First-Out).
+
+* **Logic:** You only need two things: the array itself (e.g., `stack[5]`) and a single integer variable called `top`.
+* **The `top` Variable:** This is the *most important part*. It's an index that keeps track of where the top of the stack is. We start it at `-1` to mean the stack is empty.
+* **PUSH (Adding an item):**
+    1.  **Check for Overflow:** First, check if the stack is full. If `top` is already at the last index (`MAX_SIZE - 1`), you can't add any more.
+    2.  If it's not full, you **increment `top` first** (e.g., `top` becomes `0`).
+    3.  Then, you place the new item at that position: `stack[top] = value;`.
+* **POP (Removing an item):**
+    1.  **Check for Underflow:** First, check if the stack is empty. If `top` is `-1`, you can't remove anything.
+    2.  If it's not empty, you just **decrement `top`** (e.g., `top` goes from `3` to `2`). The old value at index `3` is still there, but `top` isn't pointing to it anymore, so it's considered "removed."
+* **PEEK (Looking at the top):**
+    1.  Check if the stack is empty (`top == -1`).
+    2.  If not, just show the user the item at `stack[top]`. You don't change `top`.
+* **DISPLAY:**
+    1.  Check if the stack is empty.
+    2.  If not, use a loop that runs **backwards** from `i = top` down to `0`, printing each item. This shows the stack from top to bottom.
+
+***
+
+### 4. TCS Courier Encoder (Q5)
+
+This problem is a secret message encoder. It uses a two-step process that can be reversed to decode the message.
+
+* **Encoding Logic:**
+    1.  **Reversal Step:** The program reverses the entire string. "Rider" becomes "rediR". This is done by swapping the first and last characters, then the second and second-to-last, and so on, until you reach the middle.
+    2.  **Bit Toggling Step:** After reversal, the program loops through every character of "rediR". For each character, it flips the **2nd bit** and the **5th bit** of its ASCII value. The easiest way to do this is with the **XOR (`^`)** operator and a "mask". The mask is `18` (because the 2nd bit has a value of 2 and the 5th has a value of 16).
+* **Decoding Logic:**
+    The decoding process is the *exact same* algorithm, but applied in the **reverse order**:
+    1.  **Bit Toggling Step:** You take the gibberish encoded message and XOR every character with `18` again. Toggling twice cancels itself out and restores the reversed string ("rediR").
+    2.  **Reversal Step:** You reverse the string "rediR", which turns it back into the original message, "Rider".
